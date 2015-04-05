@@ -83,8 +83,7 @@ void check(Matrix a, myMatrix b) {
 
 
 pair < Matrix, myMatrix > getRandMatrix(int n, int m) {
-    int t = 50;
-    int T = 10;
+    int T = 1000;
     //cerr << "create\n";
     Matrix a = matrixNew(n, m);
 
@@ -95,15 +94,14 @@ pair < Matrix, myMatrix > getRandMatrix(int n, int m) {
     myMatrix b(n, m);
 
 
-    for (int i = 0; i < t; i++) {
-        float value = rand() % T;
-        int x = rand() % n;
-        int y = rand() % m;
-        //cerr << "x y value: " << x << " " << y << " " << value << endl;
-        matrixSet(a, x, y, value * 0.001);
-        //cerr << "after" << endl;
-        b.set(x, y, value * 0.001);
-    }
+    for (int x = 0; x < n; x++)
+        for (int y = 0; y < m; y++) {
+            float value = rand() % T;
+            //cerr << "x y value: " << x << " " << y << " " << value << endl;
+            matrixSet(a, x, y, value * 0.001);
+            //cerr << "after" << endl;
+            b.set(x, y, value * 0.001);
+        }
     check(a, b);
     return mp(a, b);
 }
@@ -222,7 +220,21 @@ int main() {
 
     cerr << "OK\n";
 
+    //// speed test
 
+    int n = 500;
+    int m = 500;
+    auto pr = getRandMatrix(n, m);
+    //auto pr = getRandMatrix(n, m);
+    long long c1 = clock();
+    myMatrix r1 = pr.sc.mul(pr.sc);
+    cerr << (clock() - c1) * 1.0 / CLOCKS_PER_SEC << endl;
 
+    long long c2 = clock();
+    Matrix r2 = matrixMul(pr.fr, pr.fr);
+    //cerr << r2 << endl;
+    cerr << (clock() - c2) * 1.0 / CLOCKS_PER_SEC << endl;
+    check(r2, r1); 
+    //printM(r2);
 	return 0;
 }
