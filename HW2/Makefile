@@ -1,5 +1,5 @@
 CFLAGS=-g 
-CXXFLAGS=-g -O3 -std=c++11 -fsanitize=address
+CXXFLAGS=-g -std=c++11 -fsanitize=address
 
 all: test
 

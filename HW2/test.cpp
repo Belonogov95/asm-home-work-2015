@@ -128,30 +128,39 @@ float rndFloat() {
     return x / RAND_MAX;
 }
 
+void printSZ(Matrix a) {
+    cerr << "(" << matrixGetRows(a) << ", " << matrixGetCols(a) << ")\n";
+}
+
 int main() {
-    Matrix g = matrixNew(5, 1); 
-    Matrix f = matrixNew(1, 5);
-    matrixSet(g, 0, 0, 1.0);
-    matrixSet(g, 1, 0, 1.1);
-    matrixSet(g, 2, 0, 1.2);
-    matrixSet(g, 3, 0, 1.3);
-    matrixSet(g, 4, 0, 1.4);
+    //Matrix g = matrixNew(5, 1); 
+    //Matrix f = matrixNew(1, 5);
+    //matrixSet(g, 0, 0, 1.0);
+    //matrixSet(g, 1, 0, 1.1);
+    //matrixSet(g, 2, 0, 1.2);
+    //matrixSet(g, 3, 0, 1.3);
+    //matrixSet(g, 4, 0, 1.4);
 
-    matrixSet(f, 0, 0, 1.0);
-    matrixSet(f, 0, 1, 1.1);
-    matrixSet(f, 0, 2, 1.2);
-    matrixSet(f, 0, 3, 1.3);
-    matrixSet(f, 0, 4, 1.4);
+    //matrixSet(f, 0, 0, 1.0);
+    //matrixSet(f, 0, 1, 1.1);
+    //matrixSet(f, 0, 2, 1.2);
+    //matrixSet(f, 0, 3, 1.3);
+    //matrixSet(f, 0, 4, 1.4);
 
-    printM(g);
-    printM(f);
-    Matrix t = matrixMul(g, f);     
-    cerr << "=\n";
-    cerr << matrixGetRows(t) << endl;
-    cerr << matrixGetCols(t) << endl;
-    printM(t);
+    //printM(g);
+    //printM(f);
+    //Matrix tt = matrixRotate(g);
+    //printM(tt);
+    //tt = matrixRotate(f); 
+    //printM(tt);
+    //cerr << "-----\n";
+    //Matrix t = matrixMul(g, f);     
+    //cerr << "=\n";
+    //cerr << matrixGetRows(t) << endl;
+    //cerr << matrixGetCols(t) << endl;
+    //printM(t);
 
-    return 0;
+    //return 0;
 
     //assert(freopen("log.txt", "w", stderr));
     cerr << "test set/get\n";
@@ -197,14 +206,21 @@ int main() {
     for (int t = 0; t < 10; t++) {
         int n = rand() % 10 + 1;
         int m = rand() % 10 + 1;
+        int k = rand() % 10 + 1;
         pair < Matrix, myMatrix > pr1 = getRandMatrix(n, m);
-        pair < Matrix, myMatrix > pr2 = getRandMatrix(n, m);
-        Matrix res1 = matrixAdd(pr1.fr, pr2.fr);
+        pair < Matrix, myMatrix > pr2 = getRandMatrix(m, k);
+        //cerr << "n m k: " << n << " " << m << " " << k << endl;
+        //printSZ(pr1.fr);
+        //printSZ(pr2.fr);
+        Matrix res1 = matrixMul(pr1.fr, pr2.fr);
+        //printM(res1);
         myMatrix res2 = pr1.sc.mul(pr2.sc);
         check(res1, res2);
         matrixDelete(pr1.fr);
         matrixDelete(pr2.fr);
     }
+
+    cerr << "OK\n";
 
 
 

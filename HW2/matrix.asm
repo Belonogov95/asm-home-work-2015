@@ -308,19 +308,19 @@ section .text
 
         mov r8, 0
         mov [rbp - 8], r8
-        mov r8, [r12 + ROWS]
+        mov r8, [r12 + ROWS] ; n
         mov [rbp - 16], r8
     
         .loop1
             mov r8, 0
             mov [rbp - 24], r8
-            mov r8, [r13 + COLS]
+            mov r8, [r13 + COLS] ; k
             mov [rbp - 32], r8
             .loop2  
                 ;;; main part     
                 
                 mov rcx, 0
-                mov rdi, [r13 + REALCOLS] ; m
+                mov rdi, [r12 + REALCOLS] ; m
                 xorps xmm2, xmm2
                 
                 mov r8, [rbp - 8]
@@ -331,7 +331,7 @@ section .text
 
                 .loop3
                     movups xmm0, [r12 + r8 * FLOAT_SIZE + DATA]
-                    movups xmm1, [r13 + r9 * FLOAT_SIZE + DATA]
+                    movups xmm1, [r14 + r9 * FLOAT_SIZE + DATA]
                     mulps  xmm0, xmm1
                     addps  xmm2, xmm0
 
@@ -343,7 +343,9 @@ section .text
                     jg .loop3
 
                 haddps xmm2, xmm2
+                haddps xmm2, xmm2
                 mov rcx, [rbp - 8]
+                mov rdi, [r15 + REALCOLS]
                 imul rcx, rdi
                 add rcx, [rbp - 24]
             
