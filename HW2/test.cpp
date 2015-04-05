@@ -77,7 +77,7 @@ void check(Matrix a, myMatrix b) {
     for (int i = 0; i < n; i++)
         for (int j = 0; j < m; j++) 
             assert(equal(b.get(i, j), matrixGet(a, i, j)));
-    cerr << "OK\n";
+    //cerr << "OK\n";
 }
 
 
@@ -119,41 +119,36 @@ void printM(Matrix g) {
     cerr << endl;
 }
 
+float rndFloat() {
+    float x = rand();
+    return x / RAND_MAX;
+}
 
 int main() {
-    //cerr << g << endl;
-    //cerr << p[0] << endl;
-    //cerr << p[1] << endl;
-    //cerr << matrixGetRows(g) << endl;
-    //cerr << matrixGetCols(g) << endl;
     //Matrix g = matrixNew(4, 3); 
-    //Matrix f = matrixNew(4, 3); 
     //matrixSet(g, 0, 0, 1.0);
     //matrixSet(g, 0, 1, 1.1);
     //matrixSet(g, 3, 2, -1);
 
-    //matrixSet(f, 0, 0, 1.0);
-    //matrixSet(f, 0, 1, 1.1);
-    //matrixSet(f, 3, 2, 9.3);
-
     //printM(g);
-    //printM(f);
-    //Matrix t = matrixAdd(g, f);     
+    //Matrix t = matrixScale(g, 2.5);     
     //cerr << "=\n";
     //printM(t);
 
     //return 0;
 
+    //assert(freopen("log.txt", "w", stderr));
+    cerr << "test set/get\n";
     for (int t = 0; t < 10; t++) {
         int n = rand() % 100 + 1;
         int m = rand() % 100 + 1;
         pair < Matrix, myMatrix > pr = getRandMatrix(n, m);
         matrixDelete(pr.fr);
     }
+    cerr << "OK\n";
 
 
-
-    cerr << "second part\n";
+    cerr << "test Sum\n";
     for (int t = 0; t < 10; t++) {
         int n = rand() % 10 + 1;
         int m = rand() % 10 + 1;
@@ -166,6 +161,35 @@ int main() {
         matrixDelete(pr1.fr);
         matrixDelete(pr2.fr);
     }
+    cerr << "OK\n";
+
+    cerr << "test mul scalar\n";
+    for (int t = 0; t < 10; t++) {
+        int n = rand() % 100 + 1;
+        int m = rand() % 100 + 1;
+        pair < Matrix, myMatrix > pr = getRandMatrix(n, m);
+        float k = rndFloat();
+        //k = 2;
+        Matrix c = matrixScale(pr.fr, k);
+        myMatrix d = pr.sc.mul(k);
+        check(c, d);
+        matrixDelete(pr.fr);
+    }
+    cerr << "OK\n";
+
+    cerr << "test mul matrix\n";
+    for (int t = 0; t < 10; t++) {
+        int n = rand() % 10 + 1;
+        int m = rand() % 10 + 1;
+        pair < Matrix, myMatrix > pr1 = getRandMatrix(n, m);
+        pair < Matrix, myMatrix > pr2 = getRandMatrix(n, m);
+        Matrix res1 = matrixMul(pr1.fr, pr2.fr);
+        myMatrix res2 = pr1.sc.mul(pr2.sc);
+        check(res1, res2);
+        matrixDelete(pr1.fr);
+        matrixDelete(pr2.fr);
+    }
+
 
 
 	return 0;

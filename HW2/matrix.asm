@@ -117,9 +117,6 @@ section .text
         mov r12, rdi ; a
         mov r13, rsi ; b
     
-        mov rdi, 0
-        mov rsi, 0
-
         mov rdi, [r12 + ROWS]
         mov rsi, [r12 + COLS]
         
@@ -154,6 +151,117 @@ section .text
         pop r13
         pop r12
         ret
+
+    ;Matrix matrixScale(Matrix matrix, float k);
+    ;                          rdi      
+    matrixScale:
+        push r12
+        push r13
+        push r14
+
+        mov r12, rdi ; a
+    
+        mov rdi, [r12 + ROWS]
+        mov rsi, [r12 + COLS]
+        
+        call matrixNew
+        mov r14, rax ; c
+    
+        mov rcx, 0
+        mov rdx, [r12 + REALCOLS]  
+        imul rdx, [r12 + ROWS]
+
+        unpcklps xmm0, xmm0
+        unpcklps xmm0, xmm0
+
+        .loop 
+            movups xmm1, [r12 + rcx * 4 + DATA]
+            mulps  xmm1, xmm0
+            movups [r14 + rcx * 4 + DATA], xmm1;
+
+            add rcx, 4
+            cmp rdx, rcx
+            jg .loop
+
+        mov rax, r14
+        jmp .end
+
+    .fail
+        pop r14
+        pop r13
+        pop r12
+        mov rax, 0
+        ret
+
+    .end
+        pop r14
+        pop r13
+        pop r12
+        ret
+
+
+    ;Matrix matrixMul(Matrix a, Matrix b);
+    ;                        rdi       rsi
+    matrixMul:
+        push r12
+        push r13
+        push r14
+        mov rax, [rdi + ROWS]
+        mov rcx, [rsi + ROWS] 
+        cmp rax, rcx
+        jne .fail
+
+        mov rax, [rdi + COLS]
+        mov rcx, [rsi + COLS]
+        cmp rax, rcx
+        jne .fail
+
+        mov r12, rdi ; a
+        mov r13, rsi ; b
+    
+        mov rdi, [r12 + ROWS]
+        mov rsi, [r12 + COLS]
+        
+        call matrixNew
+        mov r14, rax ; c
+    
+        mov rcx, 0
+        mov rdx, [r12 + REALCOLS]  
+        imul rdx, [r12 + ROWS]
+        .loop 
+            movups xmm0, [r12 + rcx * 4 + DATA]
+            movups xmm1, [r13 + rcx * 4 + DATA]
+            addps  xmm0, xmm1
+            movups [r14 + rcx * 4 + DATA], xmm0
+
+            add rcx, 4
+            cmp rdx, rcx
+            jg .loop
+
+        mov rax, r14
+        jmp .end
+
+    .fail
+        pop r14
+        pop r13
+        pop r12
+        mov rax, 0
+        ret
+
+    .end
+        pop r14
+        pop r13
+        pop r12
+        ret
+  
+
+
+
+
+
+
+
+
 
 ; g++-multilib
 

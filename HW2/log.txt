@@ -1,0 +1,48 @@
+test set/get
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+test Sum
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+test mul scalar
+OK
+a b: 0.000459456 -1.14352e-36
+test: test.cpp:79: void check(Matrix, myMatrix): Assertion `equall(b.get(i, j), matrixGet(a, i, j))' failed.
