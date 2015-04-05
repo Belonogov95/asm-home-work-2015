@@ -110,6 +110,10 @@ pair < Matrix, myMatrix > getRandMatrix(int n, int m) {
 
 
 void printM(Matrix g) {
+    if (g == 0) {
+        cerr << "NULL Matrix\n";
+        return;
+    }
     int n = matrixGetRows(g);
     int m = matrixGetCols(g);
     for (int i = 0; i < n; i++, cerr << endl)
@@ -125,17 +129,29 @@ float rndFloat() {
 }
 
 int main() {
-    //Matrix g = matrixNew(4, 3); 
-    //matrixSet(g, 0, 0, 1.0);
-    //matrixSet(g, 0, 1, 1.1);
-    //matrixSet(g, 3, 2, -1);
+    Matrix g = matrixNew(5, 1); 
+    Matrix f = matrixNew(1, 5);
+    matrixSet(g, 0, 0, 1.0);
+    matrixSet(g, 1, 0, 1.1);
+    matrixSet(g, 2, 0, 1.2);
+    matrixSet(g, 3, 0, 1.3);
+    matrixSet(g, 4, 0, 1.4);
 
-    //printM(g);
-    //Matrix t = matrixScale(g, 2.5);     
-    //cerr << "=\n";
-    //printM(t);
+    matrixSet(f, 0, 0, 1.0);
+    matrixSet(f, 0, 1, 1.1);
+    matrixSet(f, 0, 2, 1.2);
+    matrixSet(f, 0, 3, 1.3);
+    matrixSet(f, 0, 4, 1.4);
 
-    //return 0;
+    printM(g);
+    printM(f);
+    Matrix t = matrixMul(g, f);     
+    cerr << "=\n";
+    cerr << matrixGetRows(t) << endl;
+    cerr << matrixGetCols(t) << endl;
+    printM(t);
+
+    return 0;
 
     //assert(freopen("log.txt", "w", stderr));
     cerr << "test set/get\n";
@@ -183,7 +199,7 @@ int main() {
         int m = rand() % 10 + 1;
         pair < Matrix, myMatrix > pr1 = getRandMatrix(n, m);
         pair < Matrix, myMatrix > pr2 = getRandMatrix(n, m);
-        Matrix res1 = matrixMul(pr1.fr, pr2.fr);
+        Matrix res1 = matrixAdd(pr1.fr, pr2.fr);
         myMatrix res2 = pr1.sc.mul(pr2.sc);
         check(res1, res2);
         matrixDelete(pr1.fr);

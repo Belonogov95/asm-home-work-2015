@@ -3,14 +3,15 @@ extern calloc
 extern free
 
 global matrixNew ;done
-global matrixDelete 
+global matrixDelete ;done
 global matrixSet ;done
 global matrixGet ;done
 global matrixGetRows ;done
 global matrixGetCols ;done
-global matrixAdd
-global matrixScale
-global matrixMu
+global matrixAdd ;done
+global matrixScale ;done
+global matrixMul
+global matrixRotate
 
 %define ROWS 0
 %define COLS 8
@@ -200,48 +201,183 @@ section .text
         ret
 
 
-    ;Matrix matrixMul(Matrix a, Matrix b);
+    ;Matrix matrixRotate(Matrix a);
+    ;                           rdi
+    matrixRotate
+        push r13
+        push r14
+        push rbp
+        mov r13, rdi
+
+        ; create rotated matrix
+    
+        mov rdi, [r13 + COLS]
+        mov rsi, [r13 + ROWS]
+        
+        call matrixNew
+        mov r14, rax ; br
+
+        ; start rotate
+
+        mov rbp, rsp
+        sub rsp, 32
+
+        mov r8, 0
+        mov [rbp - 8], r8
+        mov r8, [r13 + ROWS]
+        mov [rbp - 16], r8
+    
+        .loop1
+            mov r8, 0
+            mov [rbp - 24], r8
+            mov r8, [r13 + COLS]
+            mov [rbp - 32], r8
+            .loop2  
+                mov rdi, r13
+                mov rsi, [rbp - 8] 
+                mov rdx, [rbp - 24]
+                call matrixGet   ;; get element
+
+                mov rdi, r14
+                mov rsi, [rbp - 24] 
+                mov rdx, [rbp - 8]
+                call matrixSet
+
+                mov r8, [rbp - 24]
+                inc r8
+                mov [rbp - 24], r8
+                cmp [rbp - 32], r8
+                jg .loop2
+            
+            mov r8, [rbp - 8]
+
+            inc r8
+            mov [rbp - 8], r8
+
+            cmp [rbp - 16], r8
+            jg .loop1
+
+        add rsp, 32 
+        mov rax, r14
+
+        pop rbp
+        pop r14
+        pop r13
+
+        ret
+
+
+    ;Matrix matrixMul(Matrix a, Matrix b);  
     ;                        rdi       rsi
+    ;   a = n * m  r12
+    ;   b = m * k  r13
+    ;   br= k * m  r14
+    ;   c = n * k  r15
+
     matrixMul:
         push r12
         push r13
         push r14
-        mov rax, [rdi + ROWS]
-        mov rcx, [rsi + ROWS] 
-        cmp rax, rcx
-        jne .fail
-
+        push r15
+        push rbp
         mov rax, [rdi + COLS]
-        mov rcx, [rsi + COLS]
+        mov rcx, [rsi + ROWS] 
         cmp rax, rcx
         jne .fail
 
         mov r12, rdi ; a
         mov r13, rsi ; b
-    
+
+
+    ; create matrix c
         mov rdi, [r12 + ROWS]
-        mov rsi, [r12 + COLS]
+        mov rsi, [r13 + COLS];
         
         call matrixNew
-        mov r14, rax ; c
+        mov r15, rax  ; c
+
+    ; rotate
+        mov rdi, r13 
+        call matrixRotate
+        mov r14, rax ; br
+
+;;;;;;;;;;;;;;;;;;;;;;;;;
+
+        mov rbp, rsp
+        sub rsp, 32
+
+        mov r8, 0
+        mov [rbp - 8], r8
+        mov r8, [r12 + ROWS]
+        mov [rbp - 16], r8
     
-        mov rcx, 0
-        mov rdx, [r12 + REALCOLS]  
-        imul rdx, [r12 + ROWS]
-        .loop 
-            movups xmm0, [r12 + rcx * 4 + DATA]
-            movups xmm1, [r13 + rcx * 4 + DATA]
-            addps  xmm0, xmm1
-            movups [r14 + rcx * 4 + DATA], xmm0
+        .loop1
+            mov r8, 0
+            mov [rbp - 24], r8
+            mov r8, [r13 + COLS]
+            mov [rbp - 32], r8
+            .loop2  
+                ;;; main part     
+                
+                mov rcx, 0
+                mov rdi, [r13 + REALCOLS] ; m
+                xorps xmm2, xmm2
+                
+                mov r8, [rbp - 8]
+                imul r8, rdi
 
-            add rcx, 4
-            cmp rdx, rcx
-            jg .loop
+                mov r9, [rbp - 24]
+                imul r9, rdi
 
-        mov rax, r14
+                .loop3
+                    movups xmm0, [r12 + r8 * FLOAT_SIZE + DATA]
+                    movups xmm1, [r13 + r9 * FLOAT_SIZE + DATA]
+                    mulps  xmm0, xmm1
+                    addps  xmm2, xmm0
+
+                    add rcx, 4
+                    add r8, 4
+                    add r9, 4 
+
+                    cmp rdi, rcx 
+                    jg .loop3
+
+                haddps xmm2, xmm2
+                mov rcx, [rbp - 8]
+                imul rcx, rdi
+                add rcx, [rbp - 24]
+            
+                movss [r15 + rcx * FLOAT_SIZE + DATA], xmm2
+
+                ;movups xmm1, [r12 + rcx * 4 + DATA]
+                ;mulps  xmm1, xmm0
+                
+
+                ;;;;;;;;;;;
+                mov r8, [rbp - 24]
+                inc r8
+                mov [rbp - 24], r8
+                cmp [rbp - 32], r8
+                jg .loop2
+            
+            mov r8, [rbp - 8]
+
+            inc r8
+            mov [rbp - 8], r8
+
+            cmp [rbp - 16], r8
+            jg .loop1
+
+        add rsp, 32 
+        mov rax, r15 
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
         jmp .end
 
     .fail
+        pop rbp
+        pop r15
         pop r14
         pop r13
         pop r12
@@ -249,6 +385,8 @@ section .text
         ret
 
     .end
+        pop rbp
+        pop r15
         pop r14
         pop r13
         pop r12
